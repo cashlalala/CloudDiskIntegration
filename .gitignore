@@ -1,0 +1,7 @@
+classes/
+war/WEB-INF/deploy/
+gwt-unitCache/
+test-classes/
+*.class
+*.bak
+war/union/
