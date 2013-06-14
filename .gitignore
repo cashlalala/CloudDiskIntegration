@@ -5,3 +5,4 @@ test-classes/
 *.class
 *.bak
 war/union/
+.gwt/
