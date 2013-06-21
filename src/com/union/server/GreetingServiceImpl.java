@@ -1,10 +1,17 @@
 package com.union.server;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import com.dropbox.client2.exception.DropboxException;
+import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.union.client.GreetingService;
 import com.union.shared.FieldVerifier;
 import com.union.thirdparty.DropBoxClient;
-import com.dropbox.client2.exception.DropboxException;
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
  * The server side implementation of the RPC service.
@@ -33,17 +40,36 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 		input = escapeHtml(input);
 		userAgent = escapeHtml(userAgent);
 
-		String authUrl = "";
+		StringBuffer response = new StringBuffer();
 		try {
-			authUrl = dropBoxClient.GetAuthUrl();
+			String authUrl = dropBoxClient.GetAuthUrl();
+
+			URL obj;
+			HttpURLConnection con;
+
+			obj = new URL(authUrl);
+			con = (HttpURLConnection) obj.openConnection();
+
+			BufferedReader in = new BufferedReader(new InputStreamReader(
+					con.getInputStream()));
+			String inputLine;
+
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			in.close();
 		} catch (DropboxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		return "Hello, " + input + "!<br><br>I am running " + serverInfo
-				+ ".<br><br>It looks like you are using:<br>" + userAgent
-				+ "\n" + authUrl;
+		return response.toString();
 	}
 
 	/**
